@@ -1,13 +1,13 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 const Options = () => {
-    return <>Coming Soon</>;
+  return <>Coming Soon</>;
 };
 
-ReactDOM.render(
-    <React.StrictMode>
-        <Options/>
-    </React.StrictMode>,
-    document.getElementById("root")
+const root = createRoot(document.getElementById("root") as HTMLElement);
+root.render(
+  <React.StrictMode>
+    <Options />
+  </React.StrictMode>
 );

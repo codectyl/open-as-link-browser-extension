@@ -1,16 +1,17 @@
-import React, { MouseEventHandler, useEffect, useState } from "react";
-import { Link } from "../models/link";
-import { LinkStore } from "../dao/link_store";
+import React, {MouseEventHandler, useEffect, useState} from "react";
+import {Link} from "../models/link";
+import {LinkStore} from "../dao/link_store";
 
 const LinkList = () => {
   const [links, setLinks] = useState<null | Array<Link>>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | undefined>(undefined);
 
+  const linkStore = LinkStore.getInstance();
   const loadLinks = async (): Promise<void> => {
     try {
       setIsLoading(true);
-      const fetchedLinks = await LinkStore.getInstance().getAllLinks();
+      const fetchedLinks = await linkStore.getAllLinks();
       setLinks(fetchedLinks);
     } catch (er: any) {
       setError(er.toString());
@@ -21,9 +22,9 @@ const LinkList = () => {
 
   useEffect(() => {
     loadLinks().then();
-    LinkStore.getInstance().addListener(loadLinks);
+    linkStore.addListener(loadLinks);
     return () => {
-      LinkStore.getInstance().removeListener(loadLinks);
+      linkStore.removeListener(loadLinks);
     };
   }, []);
 
@@ -40,19 +41,22 @@ const LinkList = () => {
   }
 
   return (
-    <div>
-      <ul>
-        {links.map((link, index) => (
-          <li key={index}>
-            <LinkButton
-              link={link}
-              onCopyTap={() => {}}
-              onDeleteTap={() => {}}
-            />
-          </li>
-        ))}
-      </ul>
-    </div>
+      <div>
+        <ul>
+          {links.map((link, index) => (
+              <li key={index}>
+                <LinkButton
+                    link={link}
+                    onCopyTap={() => {
+                    }}
+                    onDeleteTap={() => {
+                      linkStore.removeLink(link.id).then();
+                    }}
+                />
+              </li>
+          ))}
+        </ul>
+      </div>
   );
 };
 
@@ -61,17 +65,18 @@ const LinkButton = (props: {
   onCopyTap: MouseEventHandler<HTMLButtonElement>;
   onDeleteTap: MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const { link, onCopyTap, onDeleteTap } = props;
+  const {link, onCopyTap, onDeleteTap} = props;
   return (
-    <>
-      <div>{link.url}</div>
-      <div>
-        <button onClick={onCopyTap}>Copy</button>
-      </div>
-      <div>
-        <button onClick={onDeleteTap}>Delete</button>
-      </div>
-    </>
+      <>
+        <div>{link.name}</div>
+        <div>{link.url}</div>
+        <div>
+          <button onClick={onCopyTap}>Copy</button>
+        </div>
+        <div>
+          <button onClick={onDeleteTap}>Delete</button>
+        </div>
+      </>
   );
 };
 
