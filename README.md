@@ -1,8 +1,4 @@
-# Chrome Extension TypeScript Starter
-
-![build](https://github.com/deepakg202/chrome-open-as-link/workflows/build/badge.svg)
-
-Chrome extension to open text as a link
+# Open Text as Link
 
 ### Source Template:
 
