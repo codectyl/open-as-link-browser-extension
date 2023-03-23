@@ -1,7 +1,7 @@
 {
+  "name": "Open as Link",
+  "description": "Open text as links",
   "manifest_version": 3,
-  "name": "Chrome Open As Link",
-  "description": "Chrome extension to open text as a link",
   "version": "1.0",
   "options_ui": {
     "page": "options.html"

@@ -1,7 +1,7 @@
 {
-  "name": "chrome-open-as-link",
+  "name": "open-as-link-browser-extension",
   "version": "1.0.0",
-  "description": "chrome-open-as-link",
+  "description": "open-as-link-browser-extension",
   "main": "index.js",
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/deepakg202/chrome-open-as-link.git"
+    "url": "https://github.com/deepakg202/open-as-link-browser-extension.git"
   },
   "dependencies": {
     "@types/uuid": "^9.0.1",
