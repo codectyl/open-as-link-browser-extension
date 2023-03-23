@@ -30,7 +30,7 @@ const LinkInputForm = () => {
             </label>
 
             <label>
-                Link: Add text with a placeholder `[]` For eg: "github.com/username/{}"
+                Link: Add text with a placeholder `[]` For eg: "github.com/username/[]"
                 <input
                     type="text"
                     value={link}

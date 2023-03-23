@@ -1,6 +1,6 @@
 import { CHROME_STORAGE_LINKS_KEY, LinkStore } from "./dao/link_store";
 
-const OPEN_LINK_CONTEXT_MENU_ID = "openAsLink";
+const OPEN_SELECTED_AS_LINK_CONTEXT_MENU_ID = "openSelectedAsLink";
 LinkStore.getInstance()
   .getAllLinksAsJson()
   .then((json) =>
@@ -9,9 +9,9 @@ LinkStore.getInstance()
     })
   );
 
-const generateContextMenu = async () => {
+async function generateContextMenuForSelection() {
   chrome.contextMenus.create({
-    id: OPEN_LINK_CONTEXT_MENU_ID,
+    id: OPEN_SELECTED_AS_LINK_CONTEXT_MENU_ID,
     title: "Open As Link",
     contexts: ["selection"],
   });
@@ -22,21 +22,13 @@ const generateContextMenu = async () => {
       id: link.id,
       title: link.name,
       contexts: ["selection"],
-      parentId: OPEN_LINK_CONTEXT_MENU_ID,
+      parentId: OPEN_SELECTED_AS_LINK_CONTEXT_MENU_ID,
     });
   });
+}
+
+export const generateContextMenu = async () => {
+  chrome.contextMenus.removeAll(async () => {
+    await generateContextMenuForSelection();
+  });
 };
-
-chrome.runtime.onInstalled.addListener(generateContextMenu);
-LinkStore.getInstance().addListener(generateContextMenu);
-
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  const selectedText = info.selectionText;
-  const id = info.menuItemId;
-  if (!selectedText || typeof id !== "string") return;
-  const link = await LinkStore.getInstance().getLinkById(id);
-  const linkUrl = link?.url;
-  if (!linkUrl) return;
-  const url = linkUrl.replace(/\[\]/g, selectedText);
-  chrome.tabs.create({ url }).then();
-});
