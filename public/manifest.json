@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Chrome Open As Link",
-  "description": "Chrome Extension, TypeScript, Visual Studio Code",
+  "description": "Chrome extension open text as a link",
   "version": "1.0",
   "options_ui": {
     "page": "options.html"
@@ -26,10 +26,7 @@
   },
   "permissions": [
     "storage",
-    "contextMenus",
-    "activeTab",
-    "clipboardRead",
-    "clipboardWrite"
+    "contextMenus"
   ],
   "host_permissions": [
     "<all_urls>"

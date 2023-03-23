@@ -1,6 +1,7 @@
 import LocalForage from "localforage";
 import { Link } from "../models/link";
 import { v4 as uuidv4 } from "uuid";
+import { handleError } from "../utils";
 
 const LINK_STORE_NAME = "linkStore";
 export const CHROME_STORAGE_LINKS_KEY: string = "syncedLinks";
@@ -31,7 +32,7 @@ export class LinkStore {
     return LinkStore.instance;
   }
 
-  async syncLinks(): Promise<void> {
+  async fetchedSyncLinks(): Promise<void> {
     const val = await chrome.storage.sync.get(CHROME_STORAGE_LINKS_KEY);
     const linksStr = val[CHROME_STORAGE_LINKS_KEY];
     if (!linksStr || typeof linksStr !== "string") return;
@@ -43,6 +44,14 @@ export class LinkStore {
     });
   }
 
+  async syncLinks(): Promise<void> {
+    const links = await this.getAllLinksAsJson();
+    const jsonStr = JSON.stringify(links);
+    return await chrome.storage.sync.set({
+      [CHROME_STORAGE_LINKS_KEY]: jsonStr,
+    });
+  }
+
   constructor() {
     this.storeInstance = LocalForage.createInstance({
       name: LINK_STORE_NAME,
@@ -50,14 +59,18 @@ export class LinkStore {
       storeName: LINK_STORE_NAME,
     });
     this.prepare().then();
+    this.addListener(() => {
+      handleError(() => this.syncLinks()).then();
+    });
   }
 
   async prepare(): Promise<boolean> {
     try {
       await this.storeInstance.ready();
-      await this.syncLinks();
+      await handleError(() => this.fetchedSyncLinks());
       return true;
     } catch (er) {
+      console.error(er);
       return false;
     }
   }
