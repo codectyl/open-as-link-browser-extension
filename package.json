@@ -1,7 +1,7 @@
 {
   "name": "chrome-open-as-link",
   "version": "1.0.0",
-  "description": "chrome-extension-typescript-starter",
+  "description": "chrome-open-as-link",
   "main": "index.js",
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch",

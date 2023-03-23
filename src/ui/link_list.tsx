@@ -1,6 +1,6 @@
-import React, {MouseEventHandler, useEffect, useState} from "react";
-import {Link} from "../models/link";
-import {LinkStore} from "../dao/link_store";
+import React, { MouseEventHandler, useEffect, useState } from "react";
+import { Link } from "../models/link";
+import { LinkStore } from "../dao/link_store";
 
 const LinkList = () => {
   const [links, setLinks] = useState<null | Array<Link>>(null);
@@ -41,22 +41,21 @@ const LinkList = () => {
   }
 
   return (
-      <div>
-        <ul>
-          {links.map((link, index) => (
-              <li key={index}>
-                <LinkButton
-                    link={link}
-                    onCopyTap={() => {
-                    }}
-                    onDeleteTap={() => {
-                      linkStore.removeLink(link.id).then();
-                    }}
-                />
-              </li>
-          ))}
-        </ul>
-      </div>
+    <div>
+      <ul>
+        {links.map((link, index) => (
+          <li key={index}>
+            <LinkButton
+              link={link}
+              onCopyTap={() => {}}
+              onDeleteTap={() => {
+                linkStore.removeLink(link.id).then();
+              }}
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
@@ -65,18 +64,18 @@ const LinkButton = (props: {
   onCopyTap: MouseEventHandler<HTMLButtonElement>;
   onDeleteTap: MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const {link, onCopyTap, onDeleteTap} = props;
+  const { link, onCopyTap, onDeleteTap } = props;
   return (
-      <>
-        <div>{link.name}</div>
-        <div>{link.url}</div>
-        <div>
-          <button onClick={onCopyTap}>Copy</button>
-        </div>
-        <div>
-          <button onClick={onDeleteTap}>Delete</button>
-        </div>
-      </>
+    <>
+      <div>{link.name}</div>
+      <div>{link.url}</div>
+      <div>
+        <button onClick={onCopyTap}>Copy</button>
+      </div>
+      <div>
+        <button onClick={onDeleteTap}>Delete</button>
+      </div>
+    </>
   );
 };
 
