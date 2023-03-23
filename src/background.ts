@@ -10,13 +10,14 @@ LinkStore.getInstance()
   );
 
 async function generateContextMenuForSelection() {
+  const links = await LinkStore.getInstance().getAllLinks();
+  if (links.length === 0) return;
   chrome.contextMenus.create({
     id: OPEN_SELECTED_AS_LINK_CONTEXT_MENU_ID,
     title: "Open As Link",
     contexts: ["selection"],
   });
 
-  const links = await LinkStore.getInstance().getAllLinks();
   links.forEach((link) => {
     chrome.contextMenus.create({
       id: link.id,
