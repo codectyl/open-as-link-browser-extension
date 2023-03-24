@@ -26,3 +26,14 @@ export const generateContextMenu = async () => {
     await generateContextMenuForSelection();
   });
 };
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  const selectedText = info.selectionText;
+  const id = info.menuItemId;
+  if (!selectedText || typeof id !== "string") return;
+  const link = await LinkStore.getInstance().getLinkById(id);
+  const linkUrl = link?.url;
+  if (!linkUrl) return;
+  const url = linkUrl.replace(/\[\]/g, selectedText);
+  chrome.tabs.create({ url }).then();
+});
