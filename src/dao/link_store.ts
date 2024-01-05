@@ -1,7 +1,7 @@
 import LocalForage from "localforage";
-import { Link } from "../models/link";
+import { Link } from "~models/link";
 import { v4 as uuidv4 } from "uuid";
-import { handleError } from "../utils";
+import { handleError } from "~utils";
 
 const LINK_STORE_NAME = "linkStore";
 export const CHROME_STORAGE_LINKS_KEY: string = "syncedLinks";

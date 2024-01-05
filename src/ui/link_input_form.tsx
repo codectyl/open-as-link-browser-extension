@@ -1,6 +1,6 @@
-import { LinkStore } from "../dao/link_store";
-import React, { FormEvent, useState } from "react";
-import { Link } from "../models/link";
+import { LinkStore } from "~dao/link_store";
+import React, { type FormEvent, useState } from "react";
+import { Link } from "~models/link";
 
 const LinkInputForm = () => {
   const linkStore: LinkStore = LinkStore.getInstance();
