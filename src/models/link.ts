@@ -4,7 +4,7 @@ export class Link {
   name: string
   sortOrder: number
 
-  static withProtocol = (url: string): string => {
+  static urlWithProtocol = (url: string): string => {
     if (!/^https?:\/\//i.test(url)) {
       url = "https://" + url
     }
