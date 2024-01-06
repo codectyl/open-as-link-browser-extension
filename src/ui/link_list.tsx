@@ -1,82 +1,153 @@
-import React, { type MouseEventHandler, useEffect, useState } from "react";
-import { Link } from "~models/link";
-import { LinkStore } from "~dao/link_store";
+import {
+  Bars4Icon,
+  ClipboardDocumentListIcon,
+  ClipboardIcon,
+  DocumentDuplicateIcon,
+  TrashIcon
+} from "@heroicons/react/24/outline"
+import {
+  Card,
+  CardBody,
+  CardFooter
+} from "@material-tailwind/react/components/Card"
+import IconButton from "@material-tailwind/react/components/IconButton"
+import { List, ListItem } from "@material-tailwind/react/components/List"
+import Tooltip from "@material-tailwind/react/components/Tooltip"
+import Typography from "@material-tailwind/react/components/Typography"
+import React, { useEffect, useState, type MouseEventHandler } from "react"
+
+import { LinkStore } from "~dao/link_store"
+import { Link } from "~models/link"
+import { copyToClipboard, readClipboardText } from "~utils"
 
 const LinkList = () => {
-  const [links, setLinks] = useState<null | Array<Link>>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [links, setLinks] = useState<null | Array<Link>>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | undefined>(undefined)
 
-  const linkStore = LinkStore.getInstance();
+  const [clipboard, setClipboard] = useState<string | undefined>(undefined)
+
+  const linkStore = LinkStore.getInstance()
   const loadLinks = async (): Promise<void> => {
     try {
-      setIsLoading(true);
-      const fetchedLinks = await linkStore.getAllLinks();
-      setLinks(fetchedLinks);
+      setIsLoading(true)
+      const fetchedLinks = await linkStore.getAllLinks()
+      setLinks(fetchedLinks)
     } catch (er: any) {
-      setError(er.toString());
+      setError(er.toString())
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    loadLinks().then();
-    linkStore.addListener(loadLinks);
+    readClipboardText().then((val) => {
+      setClipboard(val)
+    })
+    loadLinks()
+    linkStore.addListener(loadLinks)
     return () => {
-      linkStore.removeListener(loadLinks);
-    };
-  }, []);
+      linkStore.removeListener(loadLinks)
+    }
+  }, [])
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Typography
+        variant="h6"
+        className="h-48 flex items-center justify-center">
+        Loading...
+      </Typography>
+    )
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <Typography
+        variant="h6"
+        className="h-48 flex items-center justify-center">
+        Error: {error}
+      </Typography>
+    )
   }
 
   if (!links) {
-    return <div>No Links Added</div>;
+    return (
+      <Typography
+        variant="h6"
+        className="h-48 flex items-center justify-center">
+        No Links Added
+      </Typography>
+    )
   }
 
   return (
     <div>
-      <ul>
+      <List>
         {links.map((link, index) => (
-          <li key={index}>
+          <ListItem key={index} className="p-1" selected={false}>
             <LinkButton
               link={link}
-              onCopyTap={() => {}}
-              onDeleteTap={() => {
-                linkStore.removeLink(link.id).then();
-              }}
+              onPasteTap={
+                clipboard
+                  ? () =>
+                      chrome.tabs.create({ url: link.resolveLink(clipboard) })
+                  : undefined
+              }
+              onCopyTap={() => copyToClipboard(link.url)}
+              onDeleteTap={() => linkStore.removeLink(link.id)}
             />
-          </li>
+          </ListItem>
         ))}
-      </ul>
+      </List>
     </div>
-  );
-};
+  )
+}
 
 const LinkButton = (props: {
-  link: Link;
-  onCopyTap: MouseEventHandler<HTMLButtonElement>;
-  onDeleteTap: MouseEventHandler<HTMLButtonElement>;
+  link: Link
+  onCopyTap: MouseEventHandler<HTMLButtonElement>
+  onDeleteTap: MouseEventHandler<HTMLButtonElement>
+  onPasteTap?: MouseEventHandler<HTMLButtonElement>
 }) => {
-  const { link, onCopyTap, onDeleteTap } = props;
+  const { link, onCopyTap, onDeleteTap, onPasteTap } = props
   return (
     <>
-      <div>{link.name}</div>
-      <div>{link.url}</div>
-      <div>
-        <button onClick={onCopyTap}>Copy</button>
-      </div>
-      <div>
-        <button onClick={onDeleteTap}>Delete</button>
-      </div>
+      <Card className="flex w-full flex-row">
+        <Bars4Icon className="h-6 w-6 ml-3 self-center flex-none" />
+        <CardBody className="grow self-center break-all">
+          <Typography variant="h6">{link.name}</Typography>
+          <Typography variant="small">{link.url}</Typography>
+        </CardBody>
+        <CardFooter className="flex-none self-center">
+          <div className="flex">
+            {onPasteTap && (
+              <Tooltip content="Paste">
+                <IconButton size="sm" variant="text" onClick={onPasteTap}>
+                  <ClipboardIcon className="h-6 w-6" />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Tooltip content="Copy">
+              <IconButton size="sm" variant="text" onClick={onCopyTap}>
+                <DocumentDuplicateIcon className="h-6 w-6" />
+              </IconButton>
+            </Tooltip>
+            <div className="mx-1" />
+            <Tooltip content="Delete">
+              <IconButton
+                size="sm"
+                variant="text"
+                color="red"
+                onClick={onDeleteTap}>
+                <TrashIcon className="h-6 w-6" />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </CardFooter>
+      </Card>
     </>
-  );
-};
+  )
+}
 
-export default LinkList;
+export default LinkList

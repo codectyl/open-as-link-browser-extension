@@ -1,8 +1,8 @@
 {
   "name": "open-as-link-browser-extension",
   "displayName": "Open as link browser extension",
-  "version": "0.0.1",
-  "description": "A basic Plasmo extension.",
+  "version": "0.1.0",
+  "description": "Open links easily",
   "author": "Codectyl",
   "scripts": {
     "dev": "plasmo dev",
@@ -10,6 +10,8 @@
     "test": "plasmo test"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.1",
+    "@material-tailwind/react": "^2.1.8",
     "localforage": "^1.10.0",
     "plasmo": "0.84.0",
     "react": "18.2.0",
@@ -23,13 +25,18 @@
     "@types/react": "18.2.37",
     "@types/react-dom": "18.2.15",
     "@types/uuid": "^9.0.7",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.33",
     "prettier": "3.0.3",
+    "tailwindcss": "^3.4.0",
     "typescript": "5.2.2"
   },
   "manifest": {
     "permissions": [
       "storage",
-      "contextMenus"
+      "contextMenus",
+      "clipboardRead",
+      "clipboardWrite"
     ],
     "host_permissions": [
       "<all_urls>"
