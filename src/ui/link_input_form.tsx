@@ -1,11 +1,10 @@
-import { Card, CardBody, CardFooter } from "@material-tailwind/react"
+import { Card } from "@material-tailwind/react"
 import Button from "@material-tailwind/react/components/Button"
 import { Input } from "@material-tailwind/react/components/Input"
 import Typography from "@material-tailwind/react/components/Typography"
 import React, { useState, type FormEvent } from "react"
 
 import { LinkStore } from "~dao/link_store"
-import { Link } from "~models/link"
 
 const LinkInputForm = () => {
   const linkStore: LinkStore = LinkStore.getInstance()
@@ -17,7 +16,7 @@ const LinkInputForm = () => {
     e.preventDefault()
     if (isSubmitting || !link || !name) return
     setIsSubmitting(true)
-    await linkStore.addLink(Link.withProtocol(link), name)
+    await linkStore.addLink(link, name)
     setLink("")
     setName("")
     setIsSubmitting(false)

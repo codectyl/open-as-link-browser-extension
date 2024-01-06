@@ -98,15 +98,15 @@ export class LinkStore {
 
   async addLink(name: string, url: string): Promise<string> {
     const uniqueId = uuidv4()
-    const linkObj = new Link(uniqueId, url, name)
+    const links = await this.getAllLinks()
+    const linkObj = new Link(uniqueId, url, name, links.length)
     const val = await this.storeInstance.setItem(uniqueId, linkObj.jsonString())
     this.notifyListeners()
     return val
   }
 
-  async editLink(id: string, url: string, name: string): Promise<string> {
-    const link = new Link(id, url, name)
-    const val = await this.storeInstance.setItem(id, link.jsonString())
+  async updateLink(link: Link): Promise<string> {
+    const val = await this.storeInstance.setItem(link.id, link.jsonString())
     this.notifyListeners()
     return val
   }

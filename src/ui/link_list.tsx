@@ -1,6 +1,4 @@
 import {
-  Bars4Icon,
-  ClipboardDocumentListIcon,
   ClipboardIcon,
   DocumentDuplicateIcon,
   TrashIcon
@@ -84,27 +82,29 @@ const LinkList = () => {
   return (
     <div>
       <List>
-        {links.map((link, index) => (
-          <ListItem key={index} className="p-1" selected={false}>
-            <LinkButton
-              link={link}
-              onPasteTap={
-                clipboard
-                  ? () =>
-                      chrome.tabs.create({ url: link.resolveLink(clipboard) })
-                  : undefined
-              }
-              onCopyTap={() => copyToClipboard(link.url)}
-              onDeleteTap={() => linkStore.removeLink(link.id)}
-            />
-          </ListItem>
-        ))}
+        {links
+          .sort((a, b) => b.sortOrder - a.sortOrder)
+          .map((link, index) => (
+            <ListItem key={index} className="p-1" selected={false}>
+              <LinkInfo
+                link={link}
+                onPasteTap={
+                  clipboard
+                    ? () =>
+                        chrome.tabs.create({ url: link.resolveLink(clipboard) })
+                    : undefined
+                }
+                onCopyTap={() => copyToClipboard(link.url)}
+                onDeleteTap={() => linkStore.removeLink(link.id)}
+              />
+            </ListItem>
+          ))}
       </List>
     </div>
   )
 }
 
-const LinkButton = (props: {
+const LinkInfo = (props: {
   link: Link
   onCopyTap: MouseEventHandler<HTMLButtonElement>
   onDeleteTap: MouseEventHandler<HTMLButtonElement>
@@ -114,7 +114,6 @@ const LinkButton = (props: {
   return (
     <>
       <Card className="flex w-full flex-row">
-        <Bars4Icon className="h-6 w-6 ml-3 self-center flex-none" />
         <CardBody className="grow self-center break-all">
           <Typography variant="h6">{link.name}</Typography>
           <Typography variant="small">{link.url}</Typography>
