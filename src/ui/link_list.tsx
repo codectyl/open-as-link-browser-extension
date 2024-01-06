@@ -88,11 +88,8 @@ const LinkList = () => {
             <ListItem key={index} className="p-1" selected={false}>
               <LinkInfo
                 link={link}
-                onPasteTap={
-                  clipboard
-                    ? () =>
-                        chrome.tabs.create({ url: link.resolveLink(clipboard) })
-                    : undefined
+                onPasteTap={() =>
+                  chrome.tabs.create({ url: link.resolveLink(clipboard ?? "") })
                 }
                 onCopyTap={() => copyToClipboard(link.url)}
                 onDeleteTap={() => linkStore.removeLink(link.id)}
@@ -108,7 +105,7 @@ const LinkInfo = (props: {
   link: Link
   onCopyTap: MouseEventHandler<HTMLButtonElement>
   onDeleteTap: MouseEventHandler<HTMLButtonElement>
-  onPasteTap?: MouseEventHandler<HTMLButtonElement>
+  onPasteTap: MouseEventHandler<HTMLButtonElement>
 }) => {
   const { link, onCopyTap, onDeleteTap, onPasteTap } = props
   return (
@@ -120,13 +117,11 @@ const LinkInfo = (props: {
         </CardBody>
         <CardFooter className="flex-none self-center">
           <div className="flex">
-            {onPasteTap && (
-              <Tooltip content="Paste">
-                <IconButton size="sm" variant="text" onClick={onPasteTap}>
-                  <ClipboardIcon className="h-6 w-6" />
-                </IconButton>
-              </Tooltip>
-            )}
+            <Tooltip content="Open">
+              <IconButton size="sm" variant="text" onClick={onPasteTap}>
+                <ClipboardIcon className="h-6 w-6" />
+              </IconButton>
+            </Tooltip>
             <Tooltip content="Copy">
               <IconButton size="sm" variant="text" onClick={onCopyTap}>
                 <DocumentDuplicateIcon className="h-6 w-6" />

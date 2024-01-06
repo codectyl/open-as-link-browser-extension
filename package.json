@@ -38,9 +38,6 @@
       "contextMenus",
       "clipboardRead",
       "clipboardWrite"
-    ],
-    "host_permissions": [
-      "<all_urls>"
     ]
   }
 }
