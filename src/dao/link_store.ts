@@ -100,7 +100,7 @@ export class LinkStore {
   async addLink(name: string, url: string): Promise<string> {
     const uniqueId = uuidv4()
     const links = await this.getAllLinks()
-    const linkObj = new Link(uniqueId, url, name, links.length)
+    const linkObj = new Link({ id: uniqueId, url, name, sortOrder: links.length })
     const val = await this.storeInstance.setItem(uniqueId, linkObj.jsonString())
     this.notifyListeners()
     return val
