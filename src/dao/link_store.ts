@@ -82,6 +82,7 @@ export class LinkStore {
       const link = Link.fromJsonString(value)
       links.push(link)
     })
+    links.sort((a, b) => a.sortOrder - b.sortOrder);
     return links
   }
 
@@ -109,6 +110,13 @@ export class LinkStore {
     const val = await this.storeInstance.setItem(link.id, link.jsonString())
     this.notifyListeners()
     return val
+  }
+
+  async updateAllLinks(links: Array<Link>): Promise<void> {
+    for (const link of links) {
+      await this.storeInstance.setItem(link.id, link.jsonString())
+    }
+    this.notifyListeners()
   }
 
   async removeLink(id: string): Promise<void> {

@@ -1,3 +1,5 @@
+import type { PickProperties } from "~types"
+
 export class Link {
   id: string
   url: string
@@ -11,14 +13,15 @@ export class Link {
     return url
   }
 
-  constructor(id: string, url: string, name: string, sortOrder: number) {
+  constructor(params: PickProperties<Link>) {
+    const { id, url, name, sortOrder } = params;
     this.id = id
     this.url = url
     this.name = name
     this.sortOrder = sortOrder
   }
 
-  toJson(): { name: string; id: string; url: string; sortOrder: number } {
+  toJson(): PickProperties<Link> {
     return {
       id: this.id,
       name: this.name,
@@ -35,8 +38,8 @@ export class Link {
     return encodeURI(this.url.replace(/\[\]/g, text))
   }
 
-  static fromJson(json: Object) {
-    return new Link(json["id"], json["name"], json["url"], json["sortOrder"])
+  static fromJson(json: PickProperties<Link>) {
+    return new Link({ id: json["id"], name: json["name"], url: json["url"], sortOrder: json["sortOrder"] })
   }
 
   static fromJsonString(jsonString: string): Link {

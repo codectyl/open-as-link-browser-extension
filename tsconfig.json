@@ -7,11 +7,12 @@
     ".plasmo/index.d.ts",
     "./**/*.ts",
     "./**/*.tsx"
-  ],
+, "src/ui/helpers/dnd-senso"  ],
   "compilerOptions": {
     "paths": {
       "~*": ["./src/*"]
     },
+    "strict": true,
     "baseUrl": "."
   }
 }
