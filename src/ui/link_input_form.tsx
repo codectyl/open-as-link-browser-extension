@@ -1,4 +1,4 @@
-import React, { useState, type FormEvent } from "react"
+import React, { useRef, useState, type FormEvent } from "react"
 
 import { LinkStore } from "~dao/link_store"
 import { Link } from "~models/link"
@@ -11,12 +11,15 @@ const LinkInputForm = () => {
   const [name, setName] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const nameInputRef = useRef<HTMLInputElement>(null)
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     try {
       if (isSubmitting || !link || !name) return
       setIsSubmitting(true)
       await linkStore.addLink(name, Link.urlWithProtocol(link))
+      nameInputRef.current?.focus()
       setLink("")
       setName("")
     } finally {
@@ -34,6 +37,7 @@ const LinkInputForm = () => {
           value={name}
           className="grow"
           onChange={(e) => setName(e.target.value)}
+          ref={nameInputRef}
         />
       </label>
       <div>

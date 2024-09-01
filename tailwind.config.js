@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {
-  content: ["./**/*.tsx"],
+  content: ["./src/**/*.tsx"],
   plugins: [require("@tailwindcss/typography"), require("daisyui")],
   daisyui: {
     themes: ["autumn", "night"],

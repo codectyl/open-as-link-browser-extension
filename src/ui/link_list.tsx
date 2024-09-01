@@ -94,25 +94,21 @@ const LinkList = () => {
       setLinks(movedArray)
       linkStore.updateAllLinks(
         movedArray.map((l, i) => {
-          l.sortOrder = i
+          // Updating the sortOrder
+          l.sortOrder = movedArray.length - 1 - i
           return l
-        }),
-        false
+        })
       )
     }
   }
-
-  const reversedLinks = links.toReversed()
 
   return (
     <DndContext
       onDragEnd={handleDragEnd}
       modifiers={[restrictToVerticalAxis]}
       sensors={sensors}>
-      <SortableContext
-        items={reversedLinks}
-        strategy={verticalListSortingStrategy}>
-        {reversedLinks.map((link, i) => (
+      <SortableContext items={links} strategy={verticalListSortingStrategy}>
+        {links.map((link, i) => (
           <div className={`py-2 ${i == 0 ? "pt-0" : ""}`} key={link.id}>
             <LinkInfo
               link={link}

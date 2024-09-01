@@ -82,7 +82,8 @@ export class LinkStore {
       const link = Link.fromJsonString(value)
       links.push(link)
     })
-    links.sort((a, b) => a.sortOrder - b.sortOrder);
+    // Descending to ascending sortOrder
+    links.sort((a, b) => b.sortOrder - a.sortOrder);
     return links
   }
 
