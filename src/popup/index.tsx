@@ -16,10 +16,11 @@ const Popup = () => {
   })
 
   return (
-    <div className="mx-5 flex flex-col h-screen">
-      <LinkInputForm />
-      <div className="m-2" />
-      <div className="h-max-100 overflow-y-auto">
+    <div className="flex flex-col h-screen border border-neutral-500 border-dashed">
+      <div className="pt-8 px-8 mb-4">
+        <LinkInputForm />
+      </div>
+      <div className="p-4 w-full overflow-y-auto h-full">
         <LinkList />
       </div>
     </div>

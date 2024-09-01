@@ -82,6 +82,8 @@ export class LinkStore {
       const link = Link.fromJsonString(value)
       links.push(link)
     })
+    // Descending to ascending sortOrder
+    links.sort((a, b) => b.sortOrder - a.sortOrder);
     return links
   }
 
@@ -99,7 +101,7 @@ export class LinkStore {
   async addLink(name: string, url: string): Promise<string> {
     const uniqueId = uuidv4()
     const links = await this.getAllLinks()
-    const linkObj = new Link(uniqueId, url, name, links.length)
+    const linkObj = new Link({ id: uniqueId, url, name, sortOrder: links.length })
     const val = await this.storeInstance.setItem(uniqueId, linkObj.jsonString())
     this.notifyListeners()
     return val
@@ -109,6 +111,13 @@ export class LinkStore {
     const val = await this.storeInstance.setItem(link.id, link.jsonString())
     this.notifyListeners()
     return val
+  }
+
+  async updateAllLinks(links: Array<Link>, notify: boolean = true): Promise<void> {
+    for (const link of links) {
+      await this.storeInstance.setItem(link.id, link.jsonString())
+    }
+    if (notify) this.notifyListeners()
   }
 
   async removeLink(id: string): Promise<void> {

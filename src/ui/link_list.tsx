@@ -1,22 +1,30 @@
 import {
-  ClipboardIcon,
-  DocumentDuplicateIcon,
-  TrashIcon
-} from "@heroicons/react/24/outline"
+  DndContext,
+  useSensor,
+  useSensors,
+  type DragEndEvent
+} from "@dnd-kit/core"
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import {
-  Card,
-  CardBody,
-  CardFooter
-} from "@material-tailwind/react/components/Card"
-import IconButton from "@material-tailwind/react/components/IconButton"
-import { List, ListItem } from "@material-tailwind/react/components/List"
-import Tooltip from "@material-tailwind/react/components/Tooltip"
-import Typography from "@material-tailwind/react/components/Typography"
-import React, { useEffect, useState, type MouseEventHandler } from "react"
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import React, {
+  useEffect,
+  useState,
+  type CSSProperties,
+  type MouseEventHandler
+} from "react"
 
 import { LinkStore } from "~dao/link_store"
 import { Link } from "~models/link"
 import { copyToClipboard, readClipboardText } from "~utils"
+
+import { DnDMouseSensor } from "./helpers/dnd_sensor"
+import { CopyIcon, OpenLinkIcon, ReorderListIcon, ThrashIcon } from "./icons"
 
 const LinkList = () => {
   const [links, setLinks] = useState<null | Array<Link>>(null)
@@ -24,6 +32,8 @@ const LinkList = () => {
   const [error, setError] = useState<string | undefined>(undefined)
 
   const [clipboard, setClipboard] = useState<string | undefined>(undefined)
+
+  const sensors = useSensors(useSensor(DnDMouseSensor))
 
   const linkStore = LinkStore.getInstance()
   const loadLinks = async (): Promise<void> => {
@@ -49,55 +59,71 @@ const LinkList = () => {
     }
   }, [])
 
-  if (isLoading) {
+  if (isLoading && !links) {
     return (
-      <Typography
-        variant="h6"
-        className="h-48 flex items-center justify-center">
+      <div className="prose prose-xl h-48 flex items-center justify-center">
         Loading...
-      </Typography>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <Typography
-        variant="h6"
-        className="h-48 flex items-center justify-center">
+      <div className="prose prose-xl h-48 flex items-center justify-center">
         Error: {error}
-      </Typography>
+      </div>
     )
   }
 
   if (!links) {
     return (
-      <Typography
-        variant="h6"
-        className="h-48 flex items-center justify-center">
+      <div className="prose prose-xl h-48 flex items-center justify-center">
         No Links Added
-      </Typography>
+      </div>
     )
   }
 
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+
+    if (links != null && over != null && active.id !== over?.id) {
+      const oldIndex = links.findIndex((l) => l.id === active.id)
+      const newIndex = links.findIndex((l) => l.id === over.id)
+      if (oldIndex === -1 || newIndex === -1) return
+      const movedArray = arrayMove(links!, oldIndex, newIndex)
+      setLinks(movedArray)
+      linkStore.updateAllLinks(
+        movedArray.map((l, i) => {
+          // Updating the sortOrder
+          l.sortOrder = movedArray.length - 1 - i
+          return l
+        })
+      )
+    }
+  }
+
   return (
-    <div>
-      <List>
-        {links
-          .sort((a, b) => b.sortOrder - a.sortOrder)
-          .map((link, index) => (
-            <ListItem key={index} className="p-1" selected={false}>
-              <LinkInfo
-                link={link}
-                onPasteTap={() =>
-                  chrome.tabs.create({ url: link.resolveLink(clipboard ?? "") })
-                }
-                onCopyTap={() => copyToClipboard(link.url)}
-                onDeleteTap={() => linkStore.removeLink(link.id)}
-              />
-            </ListItem>
-          ))}
-      </List>
-    </div>
+    <DndContext
+      onDragEnd={handleDragEnd}
+      modifiers={[restrictToVerticalAxis]}
+      sensors={sensors}>
+      <SortableContext items={links} strategy={verticalListSortingStrategy}>
+        {links.map((link, i) => (
+          <div className={`py-2 ${i == 0 ? "pt-0" : ""}`} key={link.id}>
+            <LinkInfo
+              link={link}
+              onPasteTap={() =>
+                chrome.tabs.create({
+                  url: link.resolveLink(clipboard ?? "")
+                })
+              }
+              onCopyTap={() => copyToClipboard(link.url)}
+              onDeleteTap={() => linkStore.removeLink(link.id)}
+            />
+          </div>
+        ))}
+      </SortableContext>
+    </DndContext>
   )
 }
 
@@ -108,39 +134,60 @@ const LinkInfo = (props: {
   onPasteTap: MouseEventHandler<HTMLButtonElement>
 }) => {
   const { link, onCopyTap, onDeleteTap, onPasteTap } = props
+
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: props.link.id })
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  }
+
   return (
-    <>
-      <Card className="flex w-full flex-row">
-        <CardBody className="grow self-center break-all">
-          <Typography variant="h6">{link.name}</Typography>
-          <Typography variant="small">{link.url}</Typography>
-        </CardBody>
-        <CardFooter className="flex-none self-center">
-          <div className="flex">
-            <Tooltip content="Open">
-              <IconButton size="sm" variant="text" onClick={onPasteTap}>
-                <ClipboardIcon className="h-6 w-6" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip content="Copy">
-              <IconButton size="sm" variant="text" onClick={onCopyTap}>
-                <DocumentDuplicateIcon className="h-6 w-6" />
-              </IconButton>
-            </Tooltip>
-            <div className="mx-1" />
-            <Tooltip content="Delete">
-              <IconButton
-                size="sm"
-                variant="text"
-                color="red"
-                onClick={onDeleteTap}>
-                <TrashIcon className="h-6 w-6" />
-              </IconButton>
-            </Tooltip>
-          </div>
-        </CardFooter>
-      </Card>
-    </>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      data-no-dnd="true"
+      className="card bg-base-100 shadow-md border border-neutral-50/25 cursor-default">
+      <div className="card-body p-4 flex flex-row items-center justify-between">
+        <button
+          className="btn btn-circle btn-ghost cursor-move"
+          data-no-dnd="false">
+          <ReorderListIcon />
+        </button>
+
+        <div data-no-dnd="true" className="grow">
+          <div className="font-bold text-xl">{link.name}</div>
+          <div className="text-xs font-thin">{link.url}</div>
+        </div>
+
+        <div className="space-x-2 flex flex-row flex-nowrap">
+          <span className="tooltip tooltip-left" data-tip="Open As Link">
+            <button
+              className="btn btn-circle btn-outline border-2 btn-primary"
+              onClick={onPasteTap}>
+              <OpenLinkIcon />
+            </button>
+          </span>
+          <span className="tooltip tooltip-left" data-tip="Copy">
+            <button
+              className="btn btn-circle btn-outline border-2 btn-info"
+              onClick={onCopyTap}>
+              <CopyIcon />
+            </button>
+          </span>
+          <span className="tooltip tooltip-left" data-tip="Delete">
+            <button
+              className="btn btn-circle btn-outline border-2 btn-error"
+              onClick={onDeleteTap}>
+              <ThrashIcon />
+            </button>
+          </span>
+        </div>
+      </div>
+    </div>
   )
 }
 

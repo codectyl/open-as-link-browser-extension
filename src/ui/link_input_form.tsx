@@ -1,11 +1,9 @@
-import { Card } from "@material-tailwind/react"
-import Button from "@material-tailwind/react/components/Button"
-import { Input } from "@material-tailwind/react/components/Input"
-import Typography from "@material-tailwind/react/components/Typography"
-import React, { useState, type FormEvent } from "react"
+import React, { useRef, useState, type FormEvent } from "react"
 
 import { LinkStore } from "~dao/link_store"
 import { Link } from "~models/link"
+
+import { AddIcon, LinkIcon, TagIcon } from "./icons"
 
 const LinkInputForm = () => {
   const linkStore: LinkStore = LinkStore.getInstance()
@@ -13,54 +11,57 @@ const LinkInputForm = () => {
   const [name, setName] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const nameInputRef = useRef<HTMLInputElement>(null)
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
-    if (isSubmitting || !link || !name) return
-    setIsSubmitting(true)
-    await linkStore.addLink(Link.urlWithProtocol(link), name)
-    setLink("")
-    setName("")
-    setIsSubmitting(false)
+    try {
+      if (isSubmitting || !link || !name) return
+      setIsSubmitting(true)
+      await linkStore.addLink(name, Link.urlWithProtocol(link))
+      nameInputRef.current?.focus()
+      setLink("")
+      setName("")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Card className="p-5 shadow-lg">
-        <div className="flex items-center">
-          <div className="w-1/6 flex-none">
-            <Typography variant="h6">Name:</Typography>
-          </div>
-          <div className="flex-auto">
-            <Input
-              type="text"
-              label="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              crossOrigin={undefined}
-            />
-          </div>
-        </div>
-        <div className="m-2" />
-        <div className="flex items-center">
-          <div className="w-1/6 flex-none">
-            <Typography variant="h6">Link:</Typography>
-          </div>
-          <div className="flex-auto">
-            <Input
-              type="text"
-              label="Add link with `[]` placeholder"
-              value={link}
-              placeholder='Eg: "github.com/username/[]"'
-              onChange={(e) => setLink(e.target.value)}
-              crossOrigin={undefined}
-            />
-          </div>
-        </div>
-        <div className="m-1" />
-        <Button type="submit" className="my-2">
-          Add
-        </Button>
-      </Card>
+    <form onSubmit={handleSubmit} className="space-y-2">
+      <label className="input input-bordered flex items-center gap-2">
+        <TagIcon />
+        <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          className="grow"
+          onChange={(e) => setName(e.target.value)}
+          ref={nameInputRef}
+        />
+      </label>
+      <div>
+        <label className="input input-bordered flex items-center gap-2">
+          <LinkIcon />
+          <input
+            type="text"
+            value={link}
+            className="grow"
+            placeholder='Eg: "github.com/username/[]"'
+            onChange={(e) => setLink(e.target.value)}
+          />
+        </label>
+        <div className="py-1 text-xs">Enter the link with `[]` placeholder</div>
+      </div>
+
+      <button
+        type="submit"
+        className="btn btn-primary btn-outline btn-sm mt-3 text-md gap-0 border-2">
+        Add
+        <span className="scale-75">
+          <AddIcon />
+        </span>
+      </button>
     </form>
   )
 }
