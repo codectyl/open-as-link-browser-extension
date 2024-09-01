@@ -16,7 +16,7 @@ const LinkInputForm = () => {
     try {
       if (isSubmitting || !link || !name) return
       setIsSubmitting(true)
-      await linkStore.addLink(Link.urlWithProtocol(link), name)
+      await linkStore.addLink(name, Link.urlWithProtocol(link))
       setLink("")
       setName("")
     } finally {

@@ -5,9 +5,19 @@ import {
   type DragEndEvent
 } from "@dnd-kit/core"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
-import { arrayMove, SortableContext, useSortable } from "@dnd-kit/sortable"
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import React, { useEffect, useState, type MouseEventHandler } from "react"
+import React, {
+  useEffect,
+  useState,
+  type CSSProperties,
+  type MouseEventHandler
+} from "react"
 
 import { LinkStore } from "~dao/link_store"
 import { Link } from "~models/link"
@@ -49,7 +59,7 @@ const LinkList = () => {
     }
   }, [])
 
-  if (isLoading) {
+  if (isLoading && !links) {
     return (
       <div className="prose prose-xl h-48 flex items-center justify-center">
         Loading...
@@ -81,25 +91,31 @@ const LinkList = () => {
       const newIndex = links.findIndex((l) => l.id === over.id)
       if (oldIndex === -1 || newIndex === -1) return
       const movedArray = arrayMove(links!, oldIndex, newIndex)
+      setLinks(movedArray)
       linkStore.updateAllLinks(
         movedArray.map((l, i) => {
+          l.sortOrder = i
           return l
-        })
+        }),
+        false
       )
     }
   }
+
+  const reversedLinks = links.toReversed()
 
   return (
     <DndContext
       onDragEnd={handleDragEnd}
       modifiers={[restrictToVerticalAxis]}
       sensors={sensors}>
-      <div className="space-y-2">
-        <SortableContext items={links}>
-          {links.map((link) => (
+      <SortableContext
+        items={reversedLinks}
+        strategy={verticalListSortingStrategy}>
+        {reversedLinks.map((link, i) => (
+          <div className={`py-2 ${i == 0 ? "pt-0" : ""}`} key={link.id}>
             <LinkInfo
               link={link}
-              key={link.id}
               onPasteTap={() =>
                 chrome.tabs.create({
                   url: link.resolveLink(clipboard ?? "")
@@ -108,9 +124,9 @@ const LinkList = () => {
               onCopyTap={() => copyToClipboard(link.url)}
               onDeleteTap={() => linkStore.removeLink(link.id)}
             />
-          ))}
-        </SortableContext>
-      </div>
+          </div>
+        ))}
+      </SortableContext>
     </DndContext>
   )
 }
@@ -126,7 +142,7 @@ const LinkInfo = (props: {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.link.id })
 
-  const style = {
+  const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition
   }
@@ -137,43 +153,42 @@ const LinkInfo = (props: {
       style={style}
       {...attributes}
       {...listeners}
-      data-no-dnd="true">
-      <div className="card bg-base-100 shadow-md border border-neutral-50/25 cursor-default">
-        <div className="card-body p-4 flex flex-row items-center justify-between">
-          <button
-            className="btn btn-circle btn-ghost cursor-move"
-            data-no-dnd="false">
-            <ReorderListIcon />
-          </button>
+      data-no-dnd="true"
+      className="card bg-base-100 shadow-md border border-neutral-50/25 cursor-default">
+      <div className="card-body p-4 flex flex-row items-center justify-between">
+        <button
+          className="btn btn-circle btn-ghost cursor-move"
+          data-no-dnd="false">
+          <ReorderListIcon />
+        </button>
 
-          <div data-no-dnd="true" className="grow">
-            <div className="font-bold text-xl">{link.name}</div>
-            <div className="text-xs font-thin">{link.url}</div>
-          </div>
+        <div data-no-dnd="true" className="grow">
+          <div className="font-bold text-xl">{link.name}</div>
+          <div className="text-xs font-thin">{link.url}</div>
+        </div>
 
-          <div className="space-x-2 flex flex-row flex-nowrap">
-            <span className="tooltip tooltip-left" data-tip="Open As Link">
-              <button
-                className="btn btn-circle btn-outline border-2 btn-primary"
-                onClick={onPasteTap}>
-                <OpenLinkIcon />
-              </button>
-            </span>
-            <span className="tooltip tooltip-left" data-tip="Copy">
-              <button
-                className="btn btn-circle btn-outline border-2 btn-info"
-                onClick={onCopyTap}>
-                <CopyIcon />
-              </button>
-            </span>
-            <span className="tooltip tooltip-left" data-tip="Delete">
-              <button
-                className="btn btn-circle btn-outline border-2 btn-error"
-                onClick={onDeleteTap}>
-                <ThrashIcon />
-              </button>
-            </span>
-          </div>
+        <div className="space-x-2 flex flex-row flex-nowrap">
+          <span className="tooltip tooltip-left" data-tip="Open As Link">
+            <button
+              className="btn btn-circle btn-outline border-2 btn-primary"
+              onClick={onPasteTap}>
+              <OpenLinkIcon />
+            </button>
+          </span>
+          <span className="tooltip tooltip-left" data-tip="Copy">
+            <button
+              className="btn btn-circle btn-outline border-2 btn-info"
+              onClick={onCopyTap}>
+              <CopyIcon />
+            </button>
+          </span>
+          <span className="tooltip tooltip-left" data-tip="Delete">
+            <button
+              className="btn btn-circle btn-outline border-2 btn-error"
+              onClick={onDeleteTap}>
+              <ThrashIcon />
+            </button>
+          </span>
         </div>
       </div>
     </div>

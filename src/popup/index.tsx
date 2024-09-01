@@ -20,7 +20,7 @@ const Popup = () => {
       <div className="pt-8 px-8 mb-4">
         <LinkInputForm />
       </div>
-      <div className="p-4 w-full overflow-y-auto">
+      <div className="p-4 w-full overflow-y-auto h-full">
         <LinkList />
       </div>
     </div>

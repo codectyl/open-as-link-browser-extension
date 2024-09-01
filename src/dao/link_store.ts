@@ -112,11 +112,11 @@ export class LinkStore {
     return val
   }
 
-  async updateAllLinks(links: Array<Link>): Promise<void> {
+  async updateAllLinks(links: Array<Link>, notify: boolean = true): Promise<void> {
     for (const link of links) {
       await this.storeInstance.setItem(link.id, link.jsonString())
     }
-    this.notifyListeners()
+    if (notify) this.notifyListeners()
   }
 
   async removeLink(id: string): Promise<void> {
