@@ -139,7 +139,7 @@ const LinkInfo = (props: {
     useSortable({ id: props.link.id })
 
   const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition
   }
 
@@ -153,14 +153,14 @@ const LinkInfo = (props: {
       className="card bg-base-100 shadow-md border border-neutral-50/25 cursor-default">
       <div className="card-body p-4 flex flex-row items-center justify-between">
         <button
-          className="btn btn-circle btn-ghost cursor-move"
+          className="grow btn btn-circle btn-ghost cursor-move"
           data-no-dnd="false">
           <ReorderListIcon />
         </button>
 
-        <div data-no-dnd="true" className="grow">
-          <div className="font-bold text-xl">{link.name}</div>
-          <div className="text-xs font-thin">{link.url}</div>
+        <div data-no-dnd="true" className="min-w-0">
+          <div className="font-bold text-xl text-wrap">{link.name}</div>
+          <p className="text-xs text-wrap break-words">{link.url}</p>
         </div>
 
         <div className="space-x-2 flex flex-row flex-nowrap">
