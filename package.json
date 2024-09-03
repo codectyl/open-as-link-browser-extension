@@ -1,7 +1,7 @@
 {
   "name": "open-as-link-browser-extension",
   "displayName": "Open as link browser extension",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Open links easily in a new tab",
   "author": "Codectyl",
   "scripts": {
@@ -41,7 +41,8 @@
       "storage",
       "contextMenus",
       "clipboardRead",
-      "clipboardWrite"
+      "clipboardWrite",
+      "downloads"
     ]
   }
 }

@@ -153,12 +153,12 @@ const LinkInfo = (props: {
       className="card bg-base-100 shadow-md border border-neutral-50/25 cursor-default">
       <div className="card-body p-4 flex flex-row items-center justify-between">
         <button
-          className="grow btn btn-circle btn-ghost cursor-move"
+          className="btn btn-circle btn-ghost cursor-move"
           data-no-dnd="false">
           <ReorderListIcon />
         </button>
 
-        <div data-no-dnd="true" className="min-w-0">
+        <div data-no-dnd="true" className="grow min-w-0">
           <div className="font-bold text-xl text-wrap">{link.name}</div>
           <p className="text-xs text-wrap break-words">{link.url}</p>
         </div>
