@@ -117,7 +117,7 @@ const LinkList = () => {
                   url: link.resolveLink(clipboard ?? "")
                 })
               }
-              onCopyTap={() => copyToClipboard(link.url)}
+              onCopyTap={() => copyToClipboard(link.resolveLink(clipboard ?? ""))}
               onDeleteTap={() => linkStore.removeLink(link.id)}
             />
           </div>
